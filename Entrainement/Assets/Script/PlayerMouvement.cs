@@ -1,3 +1,5 @@
+using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlayerMouvement : MonoBehaviour
@@ -15,6 +17,10 @@ public class PlayerMouvement : MonoBehaviour
     public int currentNumberJumps = 0;
     public bool isFacingRight = false;
     public VoidEventchannel onPlayerDeath;
+    public bool isPaused = false;
+    public bool onGameResume;
+    public bool onGamePause;
+    public Animator animator;
     private void OEnable()
     {
         onPlayerDeath.OnEventRaised += Die;
@@ -72,9 +78,18 @@ public class PlayerMouvement : MonoBehaviour
             );
         }
     }
+    public void onPause(){
+        isPaused = true;
+    }
+    public void onResume(){
+        isPaused = false;
+    }
     // Update is called once per frame
     void Update()
     {
+        animator.SetFloat("VelocityX", Mathf.Abs(rb.linearVelocityX));
+        animator.SetFloat("VelocityY", rb.linearVelocityY);
+        animator.SetBool("IsGrounded", isGrounded);
         //éléments pour les mouvements horizontale
         moveDirectionX = Input.GetAxis("Horizontal");
         Flip();
@@ -82,9 +97,12 @@ public class PlayerMouvement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && currentNumberJumps < maxAllowedJumps ){
             Jump();
             currentNumberJumps++;
+            if(currentNumberJumps > 1){
+                animator.SetTrigger("Doublejump");
+            }
         }
         if(isGrounded && !Input.GetButtonDown("Jump")){
             currentNumberJumps =0;
         }
-    }
+    }    
 }

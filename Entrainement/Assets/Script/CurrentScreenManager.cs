@@ -6,6 +6,8 @@ public class CurrentScreenManager : MonoBehaviour
     public GameObject GameOverScreen;
     public GameObject PauseScreen;
     public VoidEventchannel onPlayerDeath;
+    public VoidEventchannel onGamePause;
+    public VoidEventchannel onGameResume;
     private void OnEnable()
     {
         onPlayerDeath.OnEventRaised += Die;
@@ -24,25 +26,19 @@ public class CurrentScreenManager : MonoBehaviour
     private void Die(){
         GameOverScreen.SetActive(true);
     }
-    public void ResumeGame()
-    {
-        PauseScreen.SetActive(false); // Cacher le menu pause
-        Time.timeScale = 1;
-    }
-    public void PauseGame()
-    {
-        PauseScreen.SetActive(true); // Afficher le menu pause
-        Time.timeScale = 0;
-    }
     public void TogglePause()
     {
         if (Time.timeScale == 0)
         {
-            ResumeGame();
+            PauseScreen.SetActive(false); // Cacher le menu pause
+            Time.timeScale = 1;
+            onGamePause.Raise();
         }
         else
         {
-            PauseGame();
+            PauseScreen.SetActive(true); // Afficher le menu pause
+            Time.timeScale = 0;
+            onGameResume.Raise();
         }
     }
 
@@ -60,7 +56,13 @@ public class CurrentScreenManager : MonoBehaviour
         }
 #endif 
     }
+    public void ResumeGame()
+    {
+        PauseScreen.SetActive(false); // Cacher le menu pause
+        Time.timeScale = 1;
+    }
     public void RestartGame(){
+        Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
